@@ -50,7 +50,14 @@ server.use((req, res, next) => {
 
 // Set port and host
 const PORT = process.env.PORT || 3000
-const HOST = process.env.HOST || 'localhost'
+
+// Render and other providers sometimes set HOST=localhost which prevents
+// their external port scanners from detecting an open port. Prefer binding
+// to 0.0.0.0 in container/cloud environments so the service is reachable.
+let HOST = '0.0.0.0'
+if (process.env.HOST && process.env.HOST !== 'localhost') {
+  HOST = process.env.HOST
+}
 
 // Start the server with error handling
 server.listen(PORT, HOST, (err) => {
